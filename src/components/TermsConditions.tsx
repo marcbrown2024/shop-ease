@@ -3,12 +3,12 @@ import React from 'react'
 
 type Props = {}
 
-const reset = (props: Props) => {
+const TermsConditions = (props: Props) => {
   return (
     <View>
-      <Text>reset</Text>
+      <Text>TermsConditions</Text>
     </View>
   )
 }
 
-export default reset
+export default TermsConditions

@@ -6,7 +6,12 @@ module.exports = function (api) {
       // Required for expo-router
       'expo-router/babel',
       "nativewind/babel",
-      "react-native-reanimated/plugin",
+      ["module:react-native-dotenv", {
+        "envName": "APP_ENV",
+        "moduleName": "@env",
+        "path": ".env",
+      }],
+      "react-native-reanimated/plugin", // keep at end
     ],
   };
 };

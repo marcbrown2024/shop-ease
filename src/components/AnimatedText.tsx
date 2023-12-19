@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 // react native components
-import { Animated, Easing, Text, TextProps, TextStyle } from "react-native";
+import { Animated, Easing, TextProps, TextStyle } from "react-native";
 
 type Props = {
   welcomeText: string[];

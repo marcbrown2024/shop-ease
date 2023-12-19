@@ -1,67 +1,39 @@
 // react components
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 // react native components
+import Spinner from "react-native-loading-spinner-overlay";
 
 // expo components
-import { Slot, useRouter, useSegments } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import { Stack } from "expo-router";
+import { useFonts } from "expo-font";
 
 // custom components
-import WelcomePage from "./(public)/welcome";
+import SplashScreen from "src/components/SplashScreen";
+import AppPopUps from "src/components/AppPopUps";
 
-type Props = {};
+// global store
+import { useLoadingStore } from "src/store";
 
-const RootLayoutNav = (props: Props) => {
-  const tokenCache = {
-    async getToken(key: string) {
-      try {
-        return SecureStore.getItemAsync(key);
-      } catch (err) {
-        return null;
-      }
-    },
-    async saveToken(key: string, value: string) {
-      try {
-        return SecureStore.setItemAsync(key, value);
-      } catch (err) {
-        return;
-      }
-    },
-  };
+export default function RootLayout() {
+  const { loading } = useLoadingStore();
 
-  const InitialLayout = () => {
-    const { isLoaded, isSignedIn } = useAuth();
-    const segments = useSegments();
-    const router = useRouter();
+  const [fontsLoaded] = useFonts({
+    "Inter-Black": require("../../assets/fonts/SpaceMono-Regular.ttf"),
+  });
 
-    useEffect(() => {
-      if (isLoaded) {
-        router.replace("/loading");
-      } else {
-        const inTabsGroup = segments[0] === "(auth)";
-        console.log("Is signed in", isSignedIn);
+  if (!fontsLoaded) {
+    // The native splash screen will stay visible for as long as there
+    // are `<SplashScreen />` components mounted. This component can be nested.
 
-        if (isSignedIn && !inTabsGroup) {
-          router.replace("/home");
-        } else if (!isSignedIn) {
-          router.replace("/sign-up");
-        }
-      }
-    }, [isSignedIn]);
-
-    return <Slot />;
-  };
+    return <SplashScreen />;
+  }
 
   return (
-    <ClerkProvider
-      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-      tokenCache={tokenCache}
-    >
-      <InitialLayout />
-    </ClerkProvider>
+    <>
+      <AppPopUps />
+      <Spinner visible={loading} />
+      <Stack screenOptions={{ headerShown: false, animation: "fade" }} />
+    </>
   );
-};
-
-export default RootLayoutNav;
+}

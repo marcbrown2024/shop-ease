@@ -5,8 +5,8 @@ type Props = {}
 
 const SavedLists = (props: Props) => {
   return (
-    <View>
-      <Text>Shopping List</Text>
+    <View className="flex-1 items-center justify-center">
+      <Text className="text-black text-xl">Saved Lists</Text>
     </View>
   )
 }

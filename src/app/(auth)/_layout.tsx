@@ -1,21 +1,31 @@
 // react components
 import React from "react";
 
+// react native components
+
 // expo components
 import { Tabs } from "expo-router";
+import SideBar from "src/components/SideMenu/SideBar";
+
+// custom components
 
 type Props = {};
 
-const _layout = (props: Props) => {
+const AuthLayout = (props: Props) => {
   return (
-    <Tabs screenOptions={{
-      headerShown: false,
-    }}>
-      <Tabs.Screen name="home" />
-      <Tabs.Screen name="message" />
-      <Tabs.Screen name="saved-lists" />
-    </Tabs>
+    <>
+      <SideBar />
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Tabs.Screen name="home" />
+        <Tabs.Screen name="message" />
+        <Tabs.Screen name="saved-lists" />
+      </Tabs>
+    </>
   );
 };
 
-export default _layout;
+export default AuthLayout;

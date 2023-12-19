@@ -2,11 +2,10 @@
 import React, { useEffect, useState } from "react";
 
 // react native components
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 // expo components
-import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { Link } from "expo-router";
 
@@ -15,6 +14,7 @@ import AnimatedText from "../../components/AnimatedText";
 
 // constants
 import Colors from "../../constants/colors";
+
 type Props = {};
 
 const welcomeText = [
@@ -36,17 +36,18 @@ const WelcomePage = (props: Props) => {
     return () => clearInterval(textRef);
   }, []);
 
-  NavigationBar.setBackgroundColorAsync(Colors.primary);
+  if (Platform.OS === "android") {
+    NavigationBar.setBackgroundColorAsync(Colors.primary);
+  }
 
   return (
     <View
       style={{ backgroundColor: Colors.primary }}
       className="flex-1 items-center justify-end"
     >
-      <StatusBar style="light" />
       <Animated.Image
         entering={FadeIn.delay(300).springify()}
-        source={require("../../../assets/images/applogo.png")}
+        source={require("../../../assets/images/icon.png")}
         resizeMode="cover"
         className="absolute top-0 h-80 w-80 mt-10"
       />
@@ -80,7 +81,7 @@ const WelcomePage = (props: Props) => {
           entering={FadeInDown.delay(700).springify()}
           className="w-full items-center justify-center space-y-8"
         >
-          <Link href="/sign-up" asChild>
+          <Link href="/signUp" asChild>
             <TouchableOpacity className="h-14 w-full items-center justify-center bg-white rounded-md">
               <Text className="text-xl text-black font-bold tracking-wide">
                 Join Now

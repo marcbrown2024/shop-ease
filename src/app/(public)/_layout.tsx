@@ -2,23 +2,27 @@
 import React from "react";
 
 // expo components
-import { Stack } from 'expo-router'
+import { Stack } from "expo-router";
 
-type Props = {}
-
-const _layout = (props: Props) => {
+const PublicLayout = () => {
   return (
     <Stack
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="welcome" />
-      <Stack.Screen name="sign-in" />
-      <Stack.Screen name="sign-up" />
-      <Stack.Screen name="reset" />
+      <Stack.Screen
+        name="welcome"
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen name="signIn" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen name="signUp" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen
+        name="forgetPassword"
+        options={{ animation: "slide_from_bottom" }}
+      />
     </Stack>
-  )
-}
+  );
+};
 
-export default _layout
+export default PublicLayout;
