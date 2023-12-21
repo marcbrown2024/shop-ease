@@ -31,6 +31,7 @@ const AppPopUps = (props: Props) => {
       translateY.value = withTiming(150, { duration: 700 });
 
       const timeoutId = setTimeout(() => {
+        translateY.value = withTiming(0, { duration: 700 });
       }, 5000);
 
       return () => {

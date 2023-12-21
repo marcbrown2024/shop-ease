@@ -83,7 +83,7 @@ const WelcomePage = (props: Props) => {
         >
           <Link href="/signUp" asChild>
             <TouchableOpacity className="h-14 w-full items-center justify-center bg-white rounded-md">
-              <Text className="text-xl text-black font-bold tracking-wide">
+              <Text style={{color: Colors.primary}} className="text-xl font-bold tracking-wide">
                 Join Now
               </Text>
             </TouchableOpacity>

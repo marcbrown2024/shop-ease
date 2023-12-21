@@ -113,7 +113,7 @@ export const useAuthStore = create<AuthStoreState & AuthStoreActions>(
             user: resp.user,
             isLoggedIn: true,
           }));
-          router.replace("/(auth)/home");
+          router.replace("/(drawer)/(auth)/home");
         }
       } catch (e) {
         globalState.getState().setPopUpProps({
@@ -202,6 +202,7 @@ export const useAuthStore = create<AuthStoreState & AuthStoreActions>(
         }
       } finally {
         globalState.getState().setLoading(false);
+        router.replace("/(public)/signIn");
       }
     },
   })

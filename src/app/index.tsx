@@ -1,7 +1,8 @@
 // react components
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 // react native components
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // expo components
 import { useRootNavigationState } from "expo-router";
@@ -18,23 +19,29 @@ const Index = () => {
   const segments = useSegments();
   const router = useRouter();
   const navigationState = useRootNavigationState();
+  const [isFirstTime, setIsFirstTime] = useState(0);
 
   useEffect(() => {
-    if (!navigationState?.key || !initialized) return;
+    if (!initialized || !navigationState?.key) return;
 
     const inAuthGroup = segments[0] === "(auth)";
 
     // If the user is not signed in and the initial segment is not in the auth group.
     if (!isLoggedIn && !inAuthGroup) {
-      router.replace("/signIn");
+      if (isFirstTime > 0) {
+        router.replace("/signIn");
+      } else {
+        setIsFirstTime(1);
+        router.replace("/welcome");
+      }
       return;
     }
 
     // If the user is signed in and the initial segment is not in the auth group.
     if (isLoggedIn && !inAuthGroup) {
-      router.replace("/(auth)/home");
+      router.replace("/(drawer)/(auth)/home");
     }
-  }, [segments, navigationState?.key, initialized, isLoggedIn]);
+  }, [segments, navigationState?.key, initialized, isLoggedIn, isFirstTime]);
 
   // Show SplashScreen while checking authentication.
   if (!initialized) {
@@ -46,30 +53,3 @@ const Index = () => {
 };
 
 export default Index;
-
-// // Use useLayoutEffect for synchronous UI updates
-// useLayoutEffect(() => {
-//   // Check if it's the first time the app is opened
-//   const checkFirstTime = async () => {
-//     try {
-//       const value = await AsyncStorage.getItem("firstTime");
-//       if (value === null) {
-//         setIsFirstTime(true);
-//         await AsyncStorage.setItem("firstTime", "false");
-//       } else {
-//         setIsFirstTime(false);
-//       }
-//     } catch (error) {
-//       console.error("Error reading AsyncStorage:", error);
-//     }
-//   };
-
-//   checkFirstTime();
-
-//   // Simulate app loading with a delay
-//   const loadingTimeout = setTimeout(() => {
-//     setAppLoading(false);
-//   }, 3000);
-
-//   return () => clearTimeout(loadingTimeout);
-// }, []);
