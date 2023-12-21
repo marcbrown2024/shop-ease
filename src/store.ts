@@ -6,6 +6,7 @@ import {
   User,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
@@ -14,7 +15,7 @@ import { FIREBASE_AUTH } from "../config/Firebase";
 // export components
 import { router } from "expo-router";
 
-// Popup store
+// global store
 interface PopUpProps {
   visible: boolean;
   typeMessage: string;
@@ -22,31 +23,48 @@ interface PopUpProps {
   message: string;
 }
 
-interface PopUpStore {
+interface globalStateStore {
+  isTermsVisble: boolean;
+  isChecked: boolean;
+  isAddListVisible: boolean;
+  isCollaboratorsVisible: boolean;
+  isAddItemVisible: boolean;
+  loading: boolean;
   popUpProps: PopUpProps;
+  setIsTermsVisble: (isTermsVisble: boolean) => void;
+  setChecked: (isChecked: boolean) => void;
+  setAddListVisible: (isAddListVisible: boolean) => void;
+  setCollaboratorsVisible: (isCollaboratorsVisible: boolean) => void;
+  setAddItemVisible: (isAddItemVisible: boolean) => void;
+  setLoading: (loading: boolean) => void;
   setPopUpProps: (newProps: Partial<PopUpProps>) => void;
 }
 
-export const usePopUpStore = create<PopUpStore>((set) => ({
+// global store
+export const globalState = create<globalStateStore>((set) => ({
+  isTermsVisble: false,
+  isChecked: false,
+  isAddListVisible: false,
+  isCollaboratorsVisible: false,
+  isAddItemVisible: false,
+  loading: false,
   popUpProps: {
     visible: false,
     typeMessage: "",
     title: "",
     message: "",
   },
+
+  // Actions to update the state
+  setIsTermsVisble: (isTermsVisble) => set({ isTermsVisble }),
+  setChecked: (isChecked) => set({ isChecked }),
+  setAddListVisible: (isAddListVisible) => set({ isAddListVisible }),
+  setCollaboratorsVisible: (isCollaboratorsVisible) =>
+    set({ isCollaboratorsVisible }),
+  setAddItemVisible: (isAddItemVisible) => set({ isAddItemVisible }),
+  setLoading: (loading) => set({ loading }),
   setPopUpProps: (newProps) =>
     set((state) => ({ popUpProps: { ...state.popUpProps, ...newProps } })),
-}));
-
-// loading store
-interface LoadingStore {
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-}
-
-export const useLoadingStore = create<LoadingStore>((set) => ({
-  loading: false,
-  setLoading: (loading) => set({ loading }),
 }));
 
 // Auth store
@@ -57,15 +75,15 @@ interface AuthStoreState {
 }
 
 interface AuthStoreActions {
-  appSignIn: (
+  appSignIn: (email: string, password: string) => Promise<void>;
+  appForgetPassword: (
     email: string,
-    password: string,
+    setCheckEmailModal: React.Dispatch<React.SetStateAction<boolean>>
   ) => Promise<void>;
-  appSignOut: (
-  ) => Promise<void>;
+  appSignOut: () => Promise<void>;
   appSignUp: (
     email: string,
-    password: string,
+    password: string
     // displayName: string,
   ) => Promise<void>;
 }
@@ -82,110 +100,118 @@ export const useAuthStore = create<AuthStoreState & AuthStoreActions>(
           email,
           password
         );
-        usePopUpStore.getState().setPopUpProps({
-          visible: true,
-          typeMessage: "success",
-          title: "Success",
-          message: "Successfully signed in",
-        });
-        useLoadingStore.getState().setLoading(true);
-        set((state: AuthStoreState) => ({
-          user: resp.user,
-          isLoggedIn: resp.user ? true : false,
-        }));
+        // Check if the user is successfully signed in
+        if (resp.user) {
+          globalState.getState().setPopUpProps({
+            visible: true,
+            typeMessage: "success",
+            title: "Success",
+            message: "Successfully signed in",
+          });
+
+          set((state: AuthStoreState) => ({
+            user: resp.user,
+            isLoggedIn: true,
+          }));
+          router.replace("/(auth)/home");
+        }
       } catch (e) {
-        usePopUpStore.getState().setPopUpProps({
+        globalState.getState().setPopUpProps({
           visible: true,
           typeMessage: "error",
           title: "Unsuccessful sign in",
-          message: "Sign in failed. Try again.",
+          message: "Incorrect email or password. Try again..",
         });
+        globalState.getState().setLoading(true);
       } finally {
-        useLoadingStore.getState().setLoading(false);
-        router.replace("/(auth)/home");
+        globalState.getState().setLoading(false);
       }
     },
+
+    appForgetPassword: async (email, setCheckEmailModal): Promise<void> => {
+      try {
+        await sendPasswordResetEmail(FIREBASE_AUTH, email);
+        setCheckEmailModal(true);
+      } catch (err) {
+        globalState.getState().setPopUpProps({
+          visible: true,
+          typeMessage: "error",
+          title: "Unsuccessful",
+          message: "Check email and please try again.",
+        });
+      } finally {
+        globalState.getState().setLoading(false);
+      }
+    },
+
     appSignOut: async (): Promise<void> => {
       try {
         await signOut(FIREBASE_AUTH);
-        usePopUpStore.getState().setPopUpProps({
+        globalState.getState().setPopUpProps({
           visible: true,
           typeMessage: "success",
           title: "Success",
           message: "Successfully signed out",
         });
-        useLoadingStore.getState().setLoading(true);
         set((state: AuthStoreState) => ({
           user: null,
           isLoggedIn: false,
         }));
+        router.replace("/(public)/signIn");
       } catch (e) {
-        usePopUpStore.getState().setPopUpProps({
+        globalState.getState().setPopUpProps({
           visible: true,
           typeMessage: "error",
           title: "Unsuccessful sign out",
           message: "Sign out failed. Try again.",
         });
-        useLoadingStore.getState().setLoading(true);
-      } finally {
-        useLoadingStore.getState().setLoading(false);
-        router.replace("/(public)/signIn");
       }
     },
     appSignUp: async (email, password) => {
       try {
-        const resp = await createUserWithEmailAndPassword(
-          FIREBASE_AUTH,
-          email,
-          password
-        );
-        usePopUpStore.getState().setPopUpProps({
+        globalState.getState().setLoading(true);
+
+        // Attempt to create a user
+        await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+
+        // If registration is successful
+        globalState.getState().setPopUpProps({
           visible: true,
           typeMessage: "success",
           title: "Success",
-          message: "Successfully registration",
+          message: "Successfully registered",
         });
-        useLoadingStore.getState().setLoading(true);
       } catch (e) {
-        usePopUpStore.getState().setPopUpProps({
-          visible: true,
-          typeMessage: "error",
-          title: "Registration Failed",
-          message: "Please try again",
-        });
-        useLoadingStore.getState().setLoading(true);
+        // Handle specific errors
+        if ((e as any).code === "auth/email-already-in-use") {
+          globalState.getState().setPopUpProps({
+            visible: true,
+            typeMessage: "error",
+            title: "Registration Failed",
+            message: "Email is already in use. Please use a different email.",
+          });
+        } else {
+          // Handle other errors
+          console.error("Registration error:", e);
+          globalState.getState().setPopUpProps({
+            visible: true,
+            typeMessage: "error",
+            title: "Registration Failed",
+            message: "An error occurred during registration. Please try again.",
+          });
+        }
       } finally {
-        useLoadingStore.getState().setLoading(false);
+        globalState.getState().setLoading(false);
       }
     },
   })
 );
 
 // Initialize the auth store using onAuthStateChanged
-const unsub = onAuthStateChanged(FIREBASE_AUTH, (user) => {
+onAuthStateChanged(FIREBASE_AUTH, (user) => {
   useAuthStore.setState((state: AuthStoreState) => ({
     user,
     isLoggedIn: user ? true : false,
     initialized: true,
   }));
 });
-
-interface ShoppingListStore {
-  isAddListVisible: boolean,
-  isCollaboratorsVisible: boolean,
-  isAddItemVisible: boolean,
-  setAddListVisible: (loading: boolean) => void;
-  setCollaboratorsVisible: (loading: boolean) => void;
-  setAddItemVisible: (loading: boolean) => void;
-}
-
-export const shoppingListState = create<ShoppingListStore>((set) => ({
-  isAddListVisible: false,
-  isCollaboratorsVisible: false,
-  isAddItemVisible: false,
-
-  // Actions to update the state
-  setAddListVisible: (isAddListVisible) => set({ isAddListVisible }),
-  setCollaboratorsVisible: (isCollaboratorsVisible) => set({ isCollaboratorsVisible }),
-  setAddItemVisible: (isAddItemVisible) => set({ isAddItemVisible }),
-}));

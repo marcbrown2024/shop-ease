@@ -5,7 +5,7 @@ import { useAuthStore } from "src/store";
 
 type Props = {};
 
-const Message = (props: Props) => {
+const Messages = (props: Props) => {
   const { appSignOut } = useAuthStore();
 
   return (
@@ -29,4 +29,4 @@ const Message = (props: Props) => {
   );
 };
 
-export default Message;
+export default Messages;

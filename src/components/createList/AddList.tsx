@@ -12,8 +12,6 @@ import {
 } from "react-native";
 
 // expo components
-import { StatusBar } from "expo-status-bar";
-import CheckBox from "expo-checkbox";
 
 // firebase components
 import { FIREBASE_DB } from "config/Firebase";
@@ -21,41 +19,60 @@ import { addDoc, collection } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 // global state
-import { shoppingListState, usePopUpStore } from "src/store";
+import { globalState } from "src/store";
 
 // custom components
 import GradientButton from "./GradientButton";
+import ListColor from "./ListColor";
 // import Collaborators from "../Collaborators";
 
 // icons
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+
+interface collaboratorsList {
+  email: string;
+  image: string;
+}
 
 const AddList = () => {
-  const { isAddListVisible, setAddListVisible, setCollaboratorsVisible } =
-    shoppingListState();
-  const { setPopUpProps } = usePopUpStore();
+  const { isAddListVisible, setPopUpProps, setAddListVisible, setCollaboratorsVisible } =
+  globalState();
   const auth = getAuth();
   const user = auth.currentUser;
   const [listName, setListName] = useState("");
   const [shoppingdate, setShoppingdate] = useState("");
+  const [collaborators, setCollaborators] = useState<collaboratorsList[]>([]);
+  const [listColor, setListColor] = useState("");
   const [listPriority, setListPriority] = useState("");
   const [isChecked, setChecked] = useState(false);
 
   const buttonConfigurations = [
     {
       colors: ["#3BB273", "#3CB893"],
-      onPress: () => setListPriority("Low"),
+      onPress: () =>
+        setListPriority((prevPriority) =>
+          prevPriority === "Low" ? "" : "Low"
+        ),
       text: "Low",
+      check: listPriority,
     },
     {
-      colors: ["#FDE74C", "#FDCB35"],
-      onPress: () => setListPriority("Medium"),
+      colors: ["#e6cc17", "#FDCB35"],
+      onPress: () =>
+        setListPriority((prevPriority) =>
+          prevPriority === "Medium" ? "" : "Medium"
+        ),
       text: "Medium",
+      check: listPriority,
     },
     {
       colors: ["#FF5656", "#C16868"],
-      onPress: () => setListPriority("High"),
+      onPress: () =>
+        setListPriority((prevPriority) =>
+          prevPriority === "High" ? "" : "High"
+        ),
       text: "High",
+      check: listPriority,
     },
   ];
 
@@ -64,6 +81,8 @@ const AddList = () => {
     setListName("");
     setShoppingdate("");
     setListPriority("");
+    setCollaborators([]);
+    setListColor("");
     setChecked(false);
   };
 
@@ -73,6 +92,8 @@ const AddList = () => {
     setListName("");
     setShoppingdate("");
     setListPriority("");
+    setCollaborators([]);
+    setListColor("");
     setChecked(false);
   };
 
@@ -92,10 +113,13 @@ const AddList = () => {
       // Add a new document to the user's ShoppingLists collection
       const doc = await addDoc(shoppingListsCollection, {
         title: listName,
-        ShoppingDate: shoppingdate,
-        Priority: listPriority,
-        Default: isChecked,
+        shoppingDate: shoppingdate,
+        priority: listPriority,
+        collaborators: collaborators,
+        listColor: listColor,
+        default: isChecked,
       });
+
       setPopUpProps({
         visible: true,
         typeMessage: "success",
@@ -106,7 +130,10 @@ const AddList = () => {
       setListName("");
       setShoppingdate("");
       setListPriority("");
+      setCollaborators([]);
+      setListColor("");
       setChecked(false);
+      setAddListVisible(false);
     } else {
       setPopUpProps({
         visible: true,
@@ -119,12 +146,10 @@ const AddList = () => {
 
   return (
     <Modal
-      transparent={true}
       animationType="slide"
       visible={isAddListVisible}
       onRequestClose={handleCloseList}
     >
-      <StatusBar style="light" backgroundColor="#cb4834" />
       <View className="h-full w-full justify-center items-center bg-[#cb4834] px-6">
         <TouchableOpacity
           onPress={handleCloseList}
@@ -146,8 +171,8 @@ const AddList = () => {
         >
           <Ionicons name="close" size={28} color="white" />
         </TouchableOpacity>
-        <View className="h-full w-full md:w-5/6 space-y-6 px-4">
-          <View className="h-10 w-full justify-center mt-20">
+        <View className="h-full w-full md:w-5/6 space-y-4 px-4">
+          <View className="h-10 w-full justify-center mt-16">
             <Text className="text-2xl text-white font-bold">{listName}</Text>
           </View>
           <View className="space-y-8">
@@ -157,11 +182,11 @@ const AddList = () => {
                 Enter List Name
               </Text>
               <TextInput
-                placeholder="Eg. Weekly Essentials (up to 25 characters)"
+                placeholder="Eg. Weekly Essentials (up to 20 characters)"
                 placeholderTextColor="#fff"
                 value={listName}
                 onChangeText={(text) => {
-                  if (text.length <= 25) {
+                  if (text.length <= 20) {
                     setListName(text);
                   }
                 }}
@@ -185,7 +210,7 @@ const AddList = () => {
             {/* Collaborators Input */}
             <View className="space-y-2">
               <Text className="text-base text-white font-bold">
-                Add Collaborators
+                Select Collaborators
               </Text>
               <View className="border-b border-slate-300">
                 <TouchableOpacity
@@ -200,7 +225,7 @@ const AddList = () => {
               </View>
             </View>
             {/* List Priority*/}
-            <View className="space-y-2">
+            <View className="space-y-1 -mb-5">
               <Text className="text-base text-white font-bold">
                 Set Priority
               </Text>
@@ -215,21 +240,27 @@ const AddList = () => {
                 ))}
               </View>
             </View>
+            {/* Choose color for list*/}
+            <ListColor listColor={listColor} setListColor={setListColor} />
             {/* Make list default list */}
-            <View className="flex-row items-center space-x-2 mb-2">
-              <CheckBox
-                value={isChecked}
-                onValueChange={setChecked}
-                color={isChecked ? "#ff583f" : undefined}
-                className="bg-white border border-white"
-              />
-              <Text className="text-sm text-white font-bold">
+            <View className="flex-row items-center justify-between -mb-2">
+              <Text className="text-base text-white font-bold">
                 Make it default
               </Text>
-              <TouchableOpacity />
+              <TouchableOpacity
+                onPress={() => setChecked(!isChecked)}
+                style={{ backgroundColor: isChecked ? "#ff583f" : "#ccc" }}
+                className="h-7 w-7 items-center justify-center rounded-full"
+              >
+                <FontAwesome
+                  name="check"
+                  size={18}
+                  color={isChecked ? "white" : "#eee"}
+                />
+              </TouchableOpacity>
             </View>
             {/* Add to List or Clear List Buttons*/}
-            <View className="h-28 w-full space-y-4">
+            <View className="w-full space-y-5">
               <TouchableOpacity
                 style={{
                   backgroundColor: "#e3513a",
@@ -237,7 +268,7 @@ const AddList = () => {
                   shadowOpacity: 0.3,
                   elevation: 12,
                 }}
-                className="h-14 w-full items-center justify-center rounded-full"
+                className="h-12 w-full items-center justify-center rounded-full"
                 onPress={handleAddList}
               >
                 <Text className="text-base text-white font-bold">
@@ -245,7 +276,7 @@ const AddList = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="h-12 w-full items-center justify-center rounded-full"
+                className="w-full items-center justify-center rounded-full"
                 onPress={handleClearList}
               >
                 <Text className="text-base text-white font-bold">

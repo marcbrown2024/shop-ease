@@ -3,12 +3,12 @@ import React from 'react'
 
 type Props = {}
 
-const TermsConditions = (props: Props) => {
+const PrivacyPolicy = (props: Props) => {
   return (
     <View>
-      <Text>TermsConditions</Text>
+      <Text>PrivacyPolicy</Text>
     </View>
   )
 }
 
-export default TermsConditions
+export default PrivacyPolicy

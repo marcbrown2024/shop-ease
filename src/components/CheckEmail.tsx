@@ -114,7 +114,7 @@ const CheckEmail = (props: Props) => {
           <View className="h-20 w-full items-center justify-end">
             <Text className="text-sm text-[#ccc] font-medium">
               Did not recieve the email? Check your spam folder, or
-              <Text className="text-[#ffc362] font-bold">
+              <Text className="text-[#ffd53e] font-bold">
                 &nbsp; start the forget password process again.
               </Text>
             </Text>

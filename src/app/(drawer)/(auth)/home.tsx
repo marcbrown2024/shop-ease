@@ -4,52 +4,63 @@ import React, { useEffect, useState } from "react";
 // react native components
 import {
   Animated,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
   Image,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
   useWindowDimensions,
+  View,
 } from "react-native";
 
 // expo components
-import { StatusBar } from "expo-status-bar";
+import * as NavigationBar from "expo-navigation-bar";
 
 // firebase components
 import { FIREBASE_DB } from "config/Firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot, Unsubscribe } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 // global store
-import { usePopUpStore, shoppingListState } from "src/store";
+import { globalState } from "src/store";
 
 // custom components
-import AddList from "../../components/CreateList/AddList";
+import AddList from "../../../components/createList/AddList";
+import ActiveLists from "src/components/Lists/ActiveLists";
+import RecentList from "src/components/Lists/RecentList";
 
 // icons
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 
 // constants
 import Colors from "src/constants/colors";
-import { ScrollView } from "react-native-gesture-handler";
+import { StatusBar } from "expo-status-bar";
 
 type Props = {};
+
+interface collaboratorsList {
+  email: string;
+  image: string;
+}
 interface ShoppingListItem {
+  default: boolean;
+  priority: string;
+  shoppingDate: string;
   id: string;
   title: string;
-  done: boolean;
+  collaborators: collaboratorsList[];
+  listColor: string;
 }
 
 const Home = (props: Props) => {
-  const { setPopUpProps } = usePopUpStore();
   const auth = getAuth();
   const user = auth.currentUser;
+  const { setAddListVisible } = globalState();
   const [animation] = useState(new Animated.Value(0));
   const [iconColor, setIconColor] = useState("#cb4834");
   const [showInput, setShowInput] = useState(false);
   const [searchItems, setSearchItems] = useState("");
   const [search, setSearch] = useState(true);
-  const { setAddListVisible } = shoppingListState();
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const { height } = useWindowDimensions();
 
@@ -84,22 +95,45 @@ const Home = (props: Props) => {
     if (user) {
       // User is signed in
       const userId = user.uid;
-      const querySnapshot = await getDocs(
-        collection(FIREBASE_DB, "users", userId, "ShoppingLists")
+      const shoppingListRef = collection(
+        FIREBASE_DB,
+        "users",
+        userId,
+        "ShoppingLists"
       );
-      const documents: ShoppingListItem[] = [];
 
-      querySnapshot.forEach((doc) => {
-        documents.push({ ...doc.data() } as ShoppingListItem);
+      const unsubscribe = onSnapshot(shoppingListRef, (querySnapshot) => {
+        const documents: ShoppingListItem[] = [];
+        querySnapshot.forEach((doc) => {
+          documents.push({ ...doc.data(), id: doc.id } as ShoppingListItem);
+        });
+        setShoppingList(documents);
       });
 
-      setShoppingList(documents);
+      return unsubscribe;
     }
   };
 
   useEffect(() => {
-    fetchShoppingList();
+    let unsubscribe: Unsubscribe | undefined;
+
+    const fetchData = async () => {
+      unsubscribe = await fetchShoppingList();
+    };
+
+    fetchData();
+
+    return () => {
+      // Check if unsubscribe is defined before calling it
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
+
+  if (Platform.OS === "android") {
+    NavigationBar.setBackgroundColorAsync("#cb4834");
+  }
 
   return (
     <View className="flex-1 px-1 py-3">
@@ -112,7 +146,7 @@ const Home = (props: Props) => {
             <View className="h-14 w-72 md:w-80 flex-row items-center rounded-md z-10">
               <TouchableOpacity
                 onPress={handleSearchPress}
-                className="h-full w-3/12 md:w-2/12 items-center justify-center z-10"
+                className="h-full w-3/12 md:w-2/12 items-center justify-center"
               >
                 <Entypo name="magnifying-glass" size={36} color={iconColor} />
               </TouchableOpacity>
@@ -162,14 +196,14 @@ const Home = (props: Props) => {
           </TouchableOpacity>
         </View>
         <View className="h-5/6 w-full space-y-3 px-4 py-2">
-          {shoppingList.length ? (
+          {shoppingList.length === 0 ? (
             <View className="h-full w-full items-center justify-center space-y-12">
               <Image
-                source={require("../../../assets/images/emptyCart.png")}
+                source={require("../../../../assets/images/emptylist.png")}
                 resizeMode="cover"
                 style={{
-                  height: height <= 800 ? 220 : 250,
-                  width: height <= 800 ? 220 : 250,
+                  height: height <= 800 ? 250 : 300,
+                  width: height <= 800 ? 250 : 300,
                 }}
               />
               <View className="w-full">
@@ -185,7 +219,7 @@ const Home = (props: Props) => {
           ) : (
             <View>
               <View className="h-1/2 w-full justify-center">
-                <View className="h-16 w-full justify-center">
+                <View className="h-14 w-full justify-center -mb-4">
                   <Text
                     className="text-2xl md:text-4xl font-bold"
                     style={{ color: Colors.primary }}
@@ -193,13 +227,10 @@ const Home = (props: Props) => {
                     My Active Lists
                   </Text>
                 </View>
-                <ScrollView
-                  showsHorizontalScrollIndicator={true}
-                  horizontal={true}
-                ></ScrollView>
+                <ActiveLists shoppingList={shoppingList} />
               </View>
               <View className="h-1/2 w-full justify-center">
-                <View className="h-16 w-full justify-center">
+                <View className="h-14 w-full justify-center mb-4">
                   <Text
                     className="text-2xl md:text-4xl font-bold"
                     style={{ color: Colors.primary }}
@@ -207,7 +238,7 @@ const Home = (props: Props) => {
                     Recent List
                   </Text>
                 </View>
-                <ScrollView showsVerticalScrollIndicator={true}></ScrollView>
+                <RecentList shoppingList={shoppingList} />
               </View>
             </View>
           )}

@@ -25,7 +25,7 @@ import { FIREBASE_AUTH } from "config/Firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 
 // global store
-import { usePopUpStore, useLoadingStore } from "src/store";
+import { useAuthStore, globalState } from "src/store";
 
 // icons
 import { Ionicons } from "@expo/vector-icons";
@@ -44,8 +44,8 @@ if (Platform.OS === "android") {
 }
 
 const ForgetPassword = (props: Props) => {
-  const { setPopUpProps } = usePopUpStore()
-  const { loading, setLoading } = useLoadingStore();
+  const { appForgetPassword } = useAuthStore();
+  const { loading, setLoading, setPopUpProps } = globalState()
   const { height } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [checkEmailModal, setCheckEmailModal] = useState(false);
@@ -58,20 +58,7 @@ const ForgetPassword = (props: Props) => {
     const isEmailValid = /\S+@\S+\.\S+/.test(email);
     if (isEmailValid) {
       setLoading(true);
-      try {
-        await sendPasswordResetEmail(auth, email);
-        setPopUpProps({
-          visible: true,
-          typeMessage: "success",
-          title: "Success",
-          message: "Password reset email sent",
-        });
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-        setCheckEmailModal(true);
-      }
+      appForgetPassword(email, setCheckEmailModal);
     } else {
       setPopUpProps({
         visible: true,

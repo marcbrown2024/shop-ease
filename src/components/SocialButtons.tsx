@@ -2,7 +2,7 @@
 import React from "react";
 
 // react native components
-import { View, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 // icons
 import { AntDesign, FontAwesome } from "@expo/vector-icons";

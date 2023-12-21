@@ -20,10 +20,11 @@ import Checkbox from "expo-checkbox";
 import { Link } from "expo-router";
 
 // global store
-import { useAuthStore, usePopUpStore } from "src/store";
+import { useAuthStore, globalState } from "src/store";
 
 // custom components
 import { SocialButtons } from "src/components/SocialButtons";
+import TermsConditions from "src/components/termsCondition";
 
 // constants
 import Colors from "../../constants/colors";
@@ -33,12 +34,12 @@ import { FontAwesome } from "@expo/vector-icons";
 
 const SignUp = () => {
   const { appSignUp } = useAuthStore();
-  const { setPopUpProps } = usePopUpStore();
+  const { isChecked, setChecked, setIsTermsVisble, setPopUpProps } =
+    globalState();
   const { height } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setChecked] = useState(false);
   const SignkeyboardTranslateRef = useRef<Animatable.View | null>(null);
   const SignImageOpacityRef = useRef<Animatable.View | null>(null);
 
@@ -61,6 +62,12 @@ const SignUp = () => {
     0: { opacity: 0 },
     1: { opacity: 1 },
   };
+
+  useEffect(() => {
+    if (isChecked && email === "") {
+      setChecked(false);
+    }
+  }, [isChecked, email]);
 
   useEffect(() => {
     // Function to handle keyboard opening
@@ -197,16 +204,18 @@ const SignUp = () => {
           >
             <View className="flex-row items-center space-x-4 mb-4">
               <Checkbox
-                disabled={!email || !password}
                 value={isChecked}
-                onValueChange={setChecked}
                 color={isChecked ? "#f1461c" : undefined}
               />
               <View className="flex-row items-center">
-                <Text className="text-base text-white ">I Agree to the</Text>
-                <TouchableOpacity>
-                  <Text className="text-base text-white">
-                    {" "}
+                <Text className="text-base text-white ">
+                  I Agree to the&nbsp;
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setIsTermsVisble(true)}
+                  disabled={!email || !password}
+                >
+                  <Text className="text-base text-[#ffd53e] font-bold">
                     Terms and Conditions
                   </Text>
                 </TouchableOpacity>
@@ -219,7 +228,10 @@ const SignUp = () => {
               }}
               className="h-12 w-full items-center justify-center bg-white rounded-md"
             >
-              <Text className="text-lg text-black font-bold tracking-wide">
+              <Text
+                style={{ color: Colors.primary }}
+                className="text-lg font-bold tracking-wide"
+              >
                 Sign Up
               </Text>
             </TouchableOpacity>
@@ -255,6 +267,7 @@ const SignUp = () => {
           </Animated.View>
         </View>
       </Animatable.View>
+      <TermsConditions />
     </View>
   );
 };

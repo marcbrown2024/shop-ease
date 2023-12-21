@@ -14,33 +14,35 @@ import { useAuthStore } from "src/store";
 import SplashScreen from "src/components/SplashScreen";
 
 const Index = () => {
+  const { initialized, isLoggedIn } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
-
   const navigationState = useRootNavigationState();
-
-  const { initialized, isLoggedIn } = useAuthStore();
 
   useEffect(() => {
     if (!navigationState?.key || !initialized) return;
 
     const inAuthGroup = segments[0] === "(auth)";
 
-    if (
-      // If the user is not signed in and the initial segment is not anything
-      //  segment is not anything in the auth group.
-      !isLoggedIn &&
-      !inAuthGroup
-    ) {
-      // Redirect to the login page.
+    // If the user is not signed in and the initial segment is not in the auth group.
+    if (!isLoggedIn && !inAuthGroup) {
       router.replace("/signIn");
-    } else if (isLoggedIn && !inAuthGroup) {
-      // go to tabs root.
+      return;
+    }
+
+    // If the user is signed in and the initial segment is not in the auth group.
+    if (isLoggedIn && !inAuthGroup) {
       router.replace("/(auth)/home");
     }
-  }, [segments, navigationState?.key, initialized]);
+  }, [segments, navigationState?.key, initialized, isLoggedIn]);
 
-  return <SplashScreen />;
+  // Show SplashScreen while checking authentication.
+  if (!initialized) {
+    return <SplashScreen />;
+  }
+
+  // Default case: show nothing (you may modify this as needed).
+  return null;
 };
 
 export default Index;

@@ -18,7 +18,7 @@ import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 // global store
-import { useAuthStore, usePopUpStore, useLoadingStore } from "src/store";
+import { useAuthStore, globalState } from "src/store";
 
 // custom components
 import { SocialButtons } from "src/components/SocialButtons";
@@ -31,7 +31,7 @@ import { FontAwesome } from "@expo/vector-icons";
 
 const SignIn = () => {
   const { appSignIn } = useAuthStore();
-  const { setPopUpProps } = usePopUpStore();
+  const { setPopUpProps } = globalState();
   const { height } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -2,6 +2,7 @@
 import React from "react";
 
 // react native components
+import { View } from "react-native";
 import Spinner from "react-native-loading-spinner-overlay";
 
 // expo components
@@ -13,10 +14,10 @@ import SplashScreen from "src/components/SplashScreen";
 import AppPopUps from "src/components/AppPopUps";
 
 // global store
-import { useLoadingStore } from "src/store";
+import { globalState } from "src/store";
 
 export default function RootLayout() {
-  const { loading } = useLoadingStore();
+  const { loading } = globalState();
 
   const [fontsLoaded] = useFonts({
     "Inter-Black": require("../../assets/fonts/SpaceMono-Regular.ttf"),
