@@ -31,7 +31,7 @@ const WelcomePage = (props: Props) => {
     const textRef = setInterval(() => {
       setText(welcomeText[index]);
       index = (index + 1) % welcomeText.length;
-    }, 4000);
+    }, 5000);
 
     return () => clearInterval(textRef);
   }, []);
@@ -49,12 +49,12 @@ const WelcomePage = (props: Props) => {
         entering={FadeIn.delay(300).springify()}
         source={require("../../../assets/images/icon.png")}
         resizeMode="cover"
-        className="absolute top-0 h-80 w-80 mt-10"
+        className="absolute top-0 h-64 w-64 sm:h-80 sm:w-80 md:h-80 md:w-80 mt-10"
       />
       <View className="h-3/5 w-full space-y-20 px-6">
         <Animated.View
           entering={FadeInDown.delay(500).springify()}
-          className="h-52 w-full space-y-10 mt-20"
+          className="h-52 w-full space-y-10 mt-16 md:mt-20"
         >
           <View className="h-1/2 w-full space-y-2">
             <Text className="text-5xl text-white font-bold tracking-widest">
@@ -79,7 +79,7 @@ const WelcomePage = (props: Props) => {
         </Animated.View>
         <Animated.View
           entering={FadeInDown.delay(700).springify()}
-          className="w-full items-center justify-center space-y-8"
+          className="w-full items-center justify-center"
         >
           <Link href="/signUp" asChild>
             <TouchableOpacity className="h-14 w-full items-center justify-center bg-white rounded-md">

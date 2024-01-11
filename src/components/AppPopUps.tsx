@@ -31,7 +31,7 @@ const AppPopUps = (props: Props) => {
       translateY.value = withTiming(150, { duration: 700 });
 
       const timeoutId = setTimeout(() => {
-        translateY.value = withTiming(0, { duration: 700 });
+        setPopUpProps({ ...popUpProps, visible: false });
       }, 5000);
 
       return () => {
@@ -40,7 +40,7 @@ const AppPopUps = (props: Props) => {
     } else {
       translateY.value = withTiming(0, { duration: 700 });
     }
-  }, [popUpProps.visible, translateY]);
+  }, [popUpProps.visible, setPopUpProps, translateY]);
 
   return (
     <Animated.View

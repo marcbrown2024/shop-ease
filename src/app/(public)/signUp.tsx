@@ -10,8 +10,7 @@ import {
   useWindowDimensions,
   Keyboard,
 } from "react-native";
-import Spinner from "react-native-loading-spinner-overlay";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Animatable from "react-native-animatable";
 
 // expo components
@@ -95,7 +94,7 @@ const SignUp = () => {
 
   // Function to check if the form is valid and render a pop up
   const checkFormValidity = () => {
-    const isEmailValid = /\S+@\S+\.\S+/.test(email); // email validation
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+\w{2,}$/.test(email); // email validation
 
     const isPasswordValid =
       password.length >= 8 && // Minimum length of 8 characters
@@ -140,10 +139,10 @@ const SignUp = () => {
       >
         <Animatable.View
           ref={SignImageOpacityRef}
-          className="w-full sm:w-4/6 items-center justify-center"
+          className="w-full sm:w-4/6 items-center justify-center mb-4"
         >
           <Animated.Image
-            entering={FadeIn.delay(300).springify()}
+            entering={FadeInDown.delay(500).springify()}
             source={require("../../../assets/images/signUpPhoto.png")}
             resizeMode="cover"
             style={{
@@ -154,7 +153,7 @@ const SignUp = () => {
         </Animatable.View>
         <View className="h-auto w-full sm:w-4/6 justify-center space-y-6 px-6 md:px-0">
           <Animated.View
-            entering={FadeInDown.delay(500).springify()}
+            entering={FadeInDown.delay(700).springify()}
             className="w-full space-y-1 mb-3"
           >
             <Text className="text-4xl text-white font-bold">
@@ -165,7 +164,7 @@ const SignUp = () => {
             </Text>
           </Animated.View>
           <Animated.View
-            entering={FadeInDown.delay(700).springify()}
+            entering={FadeInDown.delay(900).springify()}
             className="w-full space-y-8"
           >
             <View className="w-full flex-row items-center border-b border-slate-200">
@@ -199,7 +198,7 @@ const SignUp = () => {
             </View>
           </Animated.View>
           <Animated.View
-            entering={FadeInDown.delay(900).springify()}
+            entering={FadeInDown.delay(1100).springify()}
             className="w-full space-y-6"
           >
             <View className="flex-row items-center space-x-4 mb-4">
@@ -237,7 +236,7 @@ const SignUp = () => {
             </TouchableOpacity>
           </Animated.View>
           <Animated.View
-            entering={FadeInDown.delay(900).springify()}
+            entering={FadeInDown.delay(1300).springify()}
             className="w-full items-center space-y-1"
           >
             <View className="w-full flex-row items-center">
@@ -253,7 +252,7 @@ const SignUp = () => {
             </View>
           </Animated.View>
           <Animated.View
-            entering={FadeInDown.delay(1100).springify()}
+            entering={FadeInDown.delay(1500).springify()}
             className="w-full flex-row items-center justify-center space-x-2"
           >
             <Text className="text-base text-[#eee]">

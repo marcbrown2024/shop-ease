@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native";
 
 // expo components
 import { Tabs } from "expo-router";
-import SideBar from "src/components/SideMenu/SideBar";
+import SideBarIcon from "src/components/SideMenu/SideBarIcon";
 
 // custom components
 import { useAuthStore } from "src/store";
@@ -56,7 +56,7 @@ export default function AuthLayout() {
   if (!isLoggedIn) return;
   return (
     <>
-      <SideBar />
+      <SideBarIcon />
 
       <Tabs
         screenOptions={{

@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
   Keyboard,
 } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Animatable from "react-native-animatable";
 
 // expo components
@@ -86,7 +86,7 @@ const SignIn = () => {
 
   // Function to check if the form is valid and render a pop up
   const checkFormValidity = () => {
-    const isEmailValid = /\S+@\S+\.\S+/.test(email); // email validation
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+\w{2,}$/.test(email); // email validation
 
     const isPasswordValid =
       password.length >= 8 && // Minimum length of 8 characters
@@ -127,25 +127,25 @@ const SignIn = () => {
           className="w-full sm:w-4/6 items-center justify-center"
         >
           <Animated.Image
-            entering={FadeIn.delay(300).springify()}
+            entering={FadeInDown.delay(500).springify()}
             source={require("../../../assets/images/loginPhoto.png")}
             resizeMode="cover"
             style={{
-              height: height <= 750 ? 170 : 220,
-              width: height <= 750 ? 170 : 220,
+              height: height <= 750 ? 170 : 250,
+              width: height <= 750 ? 170 : 250,
             }}
           />
         </Animatable.View>
         <View className="h-auto w-full sm:w-4/6 justify-center space-y-6 px-6 md:px-0">
           <Animated.View
-            entering={FadeInDown.delay(500).springify()}
+            entering={FadeInDown.delay(700).springify()}
             className="h-fit w-full space-y-1 mb-3"
           >
             <Text className="text-4xl text-white font-bold">Welcome Back</Text>
             <Text className="text-lg text-white">Log In to Shop@Ease</Text>
           </Animated.View>
           <Animated.View
-            entering={FadeInDown.delay(700).springify()}
+            entering={FadeInDown.delay(900).springify()}
             className="w-full items-end space-y-4"
           >
             <View className="w-full space-y-8">
@@ -155,6 +155,7 @@ const SignIn = () => {
                   placeholderTextColor="#eee"
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  autoComplete="email"
                   value={email}
                   onChangeText={(text) => setEmail(text)}
                   className="flex-1 text-lg text-white no-underline"
@@ -204,7 +205,7 @@ const SignIn = () => {
             </TouchableOpacity>
           </Animated.View>
           <Animated.View
-            entering={FadeInDown.delay(900).springify()}
+            entering={FadeInDown.delay(1100).springify()}
             className="w-full items-center space-y-1"
           >
             <View className="w-full flex-row items-center">
@@ -220,7 +221,7 @@ const SignIn = () => {
             </View>
           </Animated.View>
           <Animated.View
-            entering={FadeInDown.delay(1100).springify()}
+            entering={FadeInDown.delay(1300).springify()}
             className="w-full flex-row items-center justify-center space-x-2"
           >
             <Text className="text-base text-[#eee]">

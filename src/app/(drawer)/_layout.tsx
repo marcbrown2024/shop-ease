@@ -10,7 +10,7 @@ import { Drawer } from "expo-router/drawer";
 import { useAuthStore } from "src/store";
 
 // custom components
-import { CustomeDrawerContent } from "src/components/SideMenu/CustomeDrawerContent";
+import {SideBar} from "src/components/SideMenu/SideBar";
 
 // icons
 import {
@@ -36,7 +36,7 @@ const AuthLayout: React.FC<Props> = (props: Props) => {
       screenOptions={{
         headerShown: false,
       }}
-      drawerContent={(props) => <CustomeDrawerContent {...props} />}
+      drawerContent={(props) => <SideBar {...props} />}
     />
   );
 };

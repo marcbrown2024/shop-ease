@@ -11,18 +11,13 @@ import {
   useWindowDimensions,
   Keyboard,
 } from "react-native";
-import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Animatable from "react-native-animatable";
-import Spinner from "react-native-loading-spinner-overlay";
 
 // expo components
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
-
-// firebase components
-import { FIREBASE_AUTH } from "config/Firebase";
-import { sendPasswordResetEmail } from "firebase/auth";
 
 // global store
 import { useAuthStore, globalState } from "src/store";
@@ -45,17 +40,17 @@ if (Platform.OS === "android") {
 
 const ForgetPassword = (props: Props) => {
   const { appForgetPassword } = useAuthStore();
-  const { loading, setLoading, setPopUpProps } = globalState()
+  const { loading, setLoading, setPopUpProps } = globalState();
   const { height } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [checkEmailModal, setCheckEmailModal] = useState(false);
-  const auth = FIREBASE_AUTH;
 
   const ForgetkeyboardTranslateRef = useRef<Animatable.View | null>(null);
   const ForgetImageOpacityRef = useRef<Animatable.View | null>(null);
 
   const handleSignUp = async () => {
-    const isEmailValid = /\S+@\S+\.\S+/.test(email);
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+\w{2,}$/.test(email);
+    
     if (isEmailValid) {
       setLoading(true);
       appForgetPassword(email, setCheckEmailModal);
@@ -116,7 +111,6 @@ const ForgetPassword = (props: Props) => {
   return (
     <View className="flex-1">
       <StatusBar style="light" />
-      <Spinner visible={loading} />
       <View
         style={{ backgroundColor: Colors.primary }}
         className="relative flex-1"
@@ -137,27 +131,27 @@ const ForgetPassword = (props: Props) => {
             className="w-full sm:w-4/6 items-center justify-center"
           >
             <Animated.Image
-              entering={FadeIn.delay(500).springify()}
+              entering={FadeInDown.delay(500).springify()}
               source={require("../../../assets/images/forgetPassImg.png")}
               resizeMode="cover"
-              className="h-64 w-96 sm:h-72 sm:w-96 my-4"
+              className="h-64 w-96 sm:h-72 sm:w-96 mt-8"
             />
           </Animatable.View>
           <View className="h-3/6 w-full md:w-5/6 justify-end space-y-8">
             <Animated.View
-              entering={FadeInUp.delay(700).springify()}
+              entering={FadeInDown.delay(700).springify()}
               className="space-y-3"
             >
               <Text className="text-3xl md:text-4xl text-white font-bold">
                 Forget Password?
               </Text>
-              <Text className="text-sm md:text-base text-[#ddd] font-bold">
+              <Text className="text-sm md:text-base text-[#eee] font-bold">
                 Please enter the email address linked with your account. An
                 email will be sent with instructions to reset your password.
               </Text>
             </Animated.View>
             <Animated.View
-              entering={FadeInUp.delay(900).springify()}
+              entering={FadeInDown.delay(900).springify()}
               className="space-y-3 mb-2"
             >
               <Text className="text-lg text-white font-medium">Email</Text>
@@ -171,7 +165,7 @@ const ForgetPassword = (props: Props) => {
               />
             </Animated.View>
             <Animated.View
-              entering={FadeInUp.delay(900).springify()}
+              entering={FadeInDown.delay(900).springify()}
               className="w-full"
             >
               <TouchableOpacity

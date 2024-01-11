@@ -62,15 +62,18 @@ const CheckEmail = (props: Props) => {
         >
           <Ionicons name="close" size={28} color="white" />
         </TouchableOpacity>
-        <View className="h-2/6 w-full md:w-4/6 items-center justify-center mt-8">
+        <Animated.View
+          entering={FadeIn.delay(500)}
+          className="h-2/6 w-full md:w-4/6 items-center justify-center mt-8"
+        >
           <Image
             source={require("../../assets/images/email.png")}
             resizeMode="cover"
             className="h-40 w-40 sm:h-48 sm:w-48 my-4"
           />
-        </View>
+        </Animated.View>
         <Animated.View
-          entering={FadeIn.delay(300).springify()}
+          entering={FadeIn.delay(600)}
           className="h-full w-full md:w-4/6 items-center space-y-10 p-6"
         >
           <View className="h-auto w-full items-center space-y-8 py-2">

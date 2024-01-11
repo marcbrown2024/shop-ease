@@ -35,7 +35,12 @@ const ActiveLists = (props: Props) => {
     >
       {props.shoppingList.map((list) => (
         <TouchableOpacity
-          onPress={() => router.push("/(auth)/listItems")}
+          onPress={() =>
+            router.push({
+              pathname: `/(drawer)/(auth)/listItems`,
+              params: { listTitle: list.title, listShoppingDate: list.shoppingDate },
+            })
+          }
           key={list.id}
           style={{ backgroundColor: list.listColor }}
           className="h-fit w-80 justify-between bg-slate-500 px-6 py-4 m-auto rounded-xl"

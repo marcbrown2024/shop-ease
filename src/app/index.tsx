@@ -1,5 +1,5 @@
 // react components
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // react native components
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,12 +28,14 @@ const Index = () => {
 
     // If the user is not signed in and the initial segment is not in the auth group.
     if (!isLoggedIn && !inAuthGroup) {
-      if (isFirstTime > 0) {
-        router.replace("/signIn");
-      } else {
-        setIsFirstTime(1);
-        router.replace("/welcome");
-      }
+      router.replace("/signIn");
+
+      // if (isFirstTime > 0) {
+      //   router.replace("/signIn");
+      // } else {
+      //   setIsFirstTime(1);
+      //   router.replace("/welcome");
+      // }
       return;
     }
 
